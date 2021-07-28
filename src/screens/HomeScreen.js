@@ -16,16 +16,16 @@ export default function HomeScreen({route, navigation}) {
 
   let authenticated = JSON.stringify(umail);
 
-  const getNewStories = async () => {
-    const tops = 'https://hacker-news.firebaseio.com/v0/newstories.json';
+  const getTopStories = async () => {
+    const topstories = 'https://hacker-news.firebaseio.com/v0/topstories.json';
     try {
-      const response = await fetch(tops);
+      const response = await fetch(topstories);
       if (response.ok === false) {
-        throw new Error(`Response Error: ${response}`);
+        console.log(`Response Error: ${response}`);
       }
       const json = await response.json();
       const promises = json
-        .slice(0, 20)
+        .slice(0, 10)
         .map(id =>
           fetch(`https://hacker-news.firebaseio.com/v0/item/${id}.json`).then(
             response => response.json(),
@@ -38,23 +38,24 @@ export default function HomeScreen({route, navigation}) {
     }
   };
 
-  const getTopStories = async () => {
-    const tops = 'https://hacker-news.firebaseio.com/v0/topstories.json';
+  const getNewStories = async () => {
+    const newstories = 'https://hacker-news.firebaseio.com/v0/newstories.json';
     try {
-      const response = await fetch(tops);
+      const response = await fetch(newstories);
       if (response.ok === false) {
-        throw new Error(`Response Error: ${response}`);
+        tconsole.log(`Response Error: ${response}`);
       }
       const json = await response.json();
-      const promises = json
-        .slice(0, 20)
+      const newPromises = json
+        .slice(0, 10)
         .map(id =>
           fetch(`https://hacker-news.firebaseio.com/v0/item/${id}.json`).then(
             response => response.json(),
           ),
         );
-      const result = await Promise.all(promises);
-      setPosts(result);
+      const newResult = await Promise.all(newPromises);
+      // setPosts(newResult);
+      setPosts([...posts, ...newResult]);
     } catch (error) {
       console.error(error);
     }
@@ -97,34 +98,64 @@ export default function HomeScreen({route, navigation}) {
       ) : (
         <FlatList
           data={posts}
-          keyExtractor={item => item.id}
           ItemSeparatorComponent={Separator}
           showsVerticalScrollIndicator={false}
           showsHorizontalScrollIndicator={false}
-          renderItem={postInfo =>
-            postInfo.item.id !== null ? (
-              <TouchableOpacity
-                style={styles.listItem}
-                onPress={() => handleItemPress(postInfo.item)}>
-                <Text style={styles.title}>{postInfo.item.title}</Text>
-                {postInfo.item.url !== undefined ? (
-                  <URLparser url={postInfo.item.url} />
-                ) : (
-                  <Text style={styles.sub}>(no link)</Text>
-                )}
-                <Text style={styles.sub}>
-                  {postInfo.item.score} pts by {postInfo.item.by}{' '}
-                  {new Date().getMinutes() -
-                    new Date(
-                      (postInfo.item.time * 1000) / 60,
-                    ).getMinutes()}{' '}
-                  mins ago | {postInfo.item.descendants} comments
-                </Text>
-              </TouchableOpacity>
-            ) : (
-              <LoadingIndicatorView />
-            )
+          renderItem={
+            data =>
+              data.item.id === null ? (
+                <LoadingIndicatorView />
+              ) : (
+                <TouchableOpacity
+                  style={styles.listItem}
+                  key={data.key}
+                  onPress={() => handleItemPress(data.item)}>
+                  <Text style={styles.title}>{data.item.title}</Text>
+                  {data.item.url !== undefined ? (
+                    <URLparser url={data.item.url} />
+                  ) : (
+                    <Text style={styles.sub}>(no link)</Text>
+                  )}
+                  <Text style={styles.sub}>
+                    {data.item.score} pts by {data.item.by}{' '}
+                    {Math.abs(
+                      new Date().getMinutes() -
+                        new Date((data.item.time * 1000) / 60).getMinutes(),
+                    )}{' '}
+                    mins ago | {data.item.descendants} comments
+                  </Text>
+                </TouchableOpacity>
+              )
+            // postInfo.item.id !== null ? (
+            //   <TouchableOpacity
+            //     style={styles.listItem}
+            //     onPress={() => handleItemPress(postInfo.item)}>
+            //     <Text style={styles.title}>{postInfo.item.title}</Text>
+            //     {postInfo.item.url !== undefined ? (
+            //       <URLparser url={postInfo.item.url} />
+            //     ) : (
+            //       <Text style={styles.sub}>(no link)</Text>
+            //     )}
+            //     <Text style={styles.sub}>
+            //       {postInfo.item.score} pts by {postInfo.item.by}{' '}
+            //       {new Date().getMinutes() -
+            //         new Date(
+            //           (postInfo.item.time * 1000) / 60,
+            //         ).getMinutes()}{' '}
+            //       mins ago | {postInfo.item.descendants} comments
+            //     </Text>
+            //   </TouchableOpacity>
+            // ) : (
+            //   // renderItemComponent(postInfo, postInfo.item.id)
+            //   <LoadingIndicatorView />
+            // )
           }
+          keyExtractor={(item, index) => String(index)}
+          // keyExtractor={item => {
+          //   if (item !== null && item !== '') {
+          //     return item.id.toString();
+          //   }
+          // }}
           onEndReachedThreshold={0.9}
           onEndReached={getNewStories}
         />
