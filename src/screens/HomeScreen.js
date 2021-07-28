@@ -5,7 +5,7 @@ import SkeletonContent from 'react-native-skeleton-content-nonexpo';
 import {Appbar} from 'react-native-paper';
 
 import {Separator} from '../components/Separator';
-import {LoadingIndicatorView} from '../components/LoadingIndicatorView';
+
 import URLparser from '../components/URLparser';
 
 export default function HomeScreen({route, navigation}) {
@@ -52,7 +52,6 @@ export default function HomeScreen({route, navigation}) {
         ),
       );
       const newResult = await Promise.all(newPromises);
-      // setPosts(newResult);
       setPosts([...posts, ...newResult]);
     } catch (error) {
       console.error(error);
