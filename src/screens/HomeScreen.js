@@ -25,7 +25,7 @@ export default function HomeScreen({route, navigation}) {
       }
       const json = await response.json();
       const promises = json
-        .slice(0, 10)
+        .slice(0, 15)
         .map(id =>
           fetch(`https://hacker-news.firebaseio.com/v0/item/${id}.json`).then(
             response => response.json(),
@@ -46,13 +46,11 @@ export default function HomeScreen({route, navigation}) {
         tconsole.log(`Response Error: ${response}`);
       }
       const json = await response.json();
-      const newPromises = json
-        .slice(0, 10)
-        .map(id =>
-          fetch(`https://hacker-news.firebaseio.com/v0/item/${id}.json`).then(
-            response => response.json(),
-          ),
-        );
+      const newPromises = json.map(id =>
+        fetch(`https://hacker-news.firebaseio.com/v0/item/${id}.json`).then(
+          response => response.json(),
+        ),
+      );
       const newResult = await Promise.all(newPromises);
       // setPosts(newResult);
       setPosts([...posts, ...newResult]);
