@@ -76,12 +76,20 @@ export default function HomeScreen({route, navigation}) {
           isLoading={loading}
           containerStyle={styles.skeleton}
           layout={[
-            {key: 'title', width: '100%', height: 60, margin: 20},
-            {key: 'sub', width: '70%', height: 40, margin: 20},
+            {key: 'title1', width: '90%', height: 60, margin: 10},
+            {key: 'sub1', width: '70%', height: 30, margin: 10},
+            {key: 'title2', width: '90%', height: 60, margin: 10},
+            {key: 'sub2', width: '70%', height: 30, margin: 10},
+            {key: 'title3', width: '90%', height: 60, margin: 10},
+            {key: 'sub3', width: '70%', height: 30, margin: 10},
+            {key: 'title4', width: '90%', height: 60, margin: 10},
+            {key: 'sub4', width: '70%', height: 30, margin: 10},
           ]}>
           <FlatList
             renderItem={
               <TouchableOpacity>
+                <Text></Text>
+                <Text></Text>
                 <Text></Text>
                 <Text></Text>
               </TouchableOpacity>
