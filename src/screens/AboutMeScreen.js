@@ -32,9 +32,9 @@ export default function AboutMeScreen() {
           contentContainerStyle={styles.containerStyle}>
           <Text style={styles.heading}>
             Occian Fumnanya Diaali is a Nigerian, born of a royal family from a
-            tribe in Delta state. He enjoys reading, painting, or playing 2D
-            video games when he's not busy improving his skills as a world-class
-            software developer while solving real-world problems with software.
+            tribe in Delta state. He enjoys reading, painting, cooking, and
+            playing 2D video games when he's not working to improve and increase
+            his software developer skills and knowledge.
           </Text>
           <Text style={styles.sub}>
             He sometimes dreams of an equitable world.
@@ -69,6 +69,7 @@ const styles = StyleSheet.create({
     color: 'gray',
     fontWeight: 'bold',
     marginBottom: 9,
+    lineHeight: 27,
   },
   sub: {
     fontSize: 19,

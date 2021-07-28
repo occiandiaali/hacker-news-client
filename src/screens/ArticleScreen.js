@@ -8,8 +8,6 @@ import {LoadingIndicatorView} from '../components/LoadingIndicatorView';
 
 const ArticleScreen = props => {
   const [article, setArticle] = useState('');
-
-  console.log(`URL: ${article.url}`);
   useEffect(() => {
     const article = props.route.params.article;
     setArticle(article);
