@@ -25,12 +25,14 @@ const db = openDatabase(
 );
 
 export default function UserLoginReg({navigation}) {
+  // I used separate variables for reg and login
+  // because of a 'quirk' encountered with RN Paper Modal
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [userEmail, setUserEmail] = useState(email);
   const [userPassword, setUserPassword] = useState(password);
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [isAuth, setIsAuth] = useState(false);
+
   const [isModalVisible, setModalVisible] = useState(false);
   const showModal = () => setModalVisible(true);
   const hideModal = () => setModalVisible(false);
@@ -63,8 +65,8 @@ export default function UserLoginReg({navigation}) {
     }
     await db.transaction(txn => {
       txn.executeSql(
-        'SELECT email, password FROM Users',
-        [],
+        'SELECT * FROM Users WHERE email = ? AND password = ?',
+        [email, password],
         (txn, results) => {
           const len = results.rows.length;
           if (!len) {
@@ -73,10 +75,7 @@ export default function UserLoginReg({navigation}) {
           if (len > 0) {
             const row = results.rows.item(0);
             if (userPassword === row.password) {
-              setIsAuth(isAuth);
-
               setUserEmail(userEmail);
-              console.log(`User Email: ${userEmail}`);
               navigation.navigate('Home', {umail: userEmail});
             } else {
               Alert.alert('Alert!', 'Authentication Failed!');
@@ -124,7 +123,6 @@ export default function UserLoginReg({navigation}) {
 
       setEmail(email);
       setPassword(password);
-      console.log(`email: ${email} - pass: ${password}`);
       navigation.navigate('Home', {umail: email});
     } catch (error) {
       console.log(`DB Insertion err: ${error} `);
