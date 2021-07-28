@@ -101,61 +101,32 @@ export default function HomeScreen({route, navigation}) {
           ItemSeparatorComponent={Separator}
           showsVerticalScrollIndicator={false}
           showsHorizontalScrollIndicator={false}
-          renderItem={
-            data =>
-              data.item.id === null ? (
-                <LoadingIndicatorView />
-              ) : (
-                <TouchableOpacity
-                  style={styles.listItem}
-                  key={data.key}
-                  onPress={() => handleItemPress(data.item)}>
-                  <Text style={styles.title}>{data.item.title}</Text>
-                  {data.item.url !== undefined ? (
-                    <URLparser url={data.item.url} />
-                  ) : (
-                    <Text style={styles.sub}>(no link)</Text>
-                  )}
-                  <Text style={styles.sub}>
-                    {data.item.score} pts by {data.item.by}{' '}
-                    {Math.abs(
-                      new Date().getMinutes() -
-                        new Date((data.item.time * 1000) / 60).getMinutes(),
-                    )}{' '}
-                    mins ago | {data.item.descendants} comments
-                  </Text>
-                </TouchableOpacity>
-              )
-            // postInfo.item.id !== null ? (
-            //   <TouchableOpacity
-            //     style={styles.listItem}
-            //     onPress={() => handleItemPress(postInfo.item)}>
-            //     <Text style={styles.title}>{postInfo.item.title}</Text>
-            //     {postInfo.item.url !== undefined ? (
-            //       <URLparser url={postInfo.item.url} />
-            //     ) : (
-            //       <Text style={styles.sub}>(no link)</Text>
-            //     )}
-            //     <Text style={styles.sub}>
-            //       {postInfo.item.score} pts by {postInfo.item.by}{' '}
-            //       {new Date().getMinutes() -
-            //         new Date(
-            //           (postInfo.item.time * 1000) / 60,
-            //         ).getMinutes()}{' '}
-            //       mins ago | {postInfo.item.descendants} comments
-            //     </Text>
-            //   </TouchableOpacity>
-            // ) : (
-            //   // renderItemComponent(postInfo, postInfo.item.id)
-            //   <LoadingIndicatorView />
-            // )
+          renderItem={data =>
+            data.item.id === null ? (
+              {}
+            ) : (
+              <TouchableOpacity
+                style={styles.listItem}
+                key={data.key}
+                onPress={() => handleItemPress(data.item)}>
+                <Text style={styles.title}>{data.item.title}</Text>
+                {data.item.url !== undefined ? (
+                  <URLparser url={data.item.url} />
+                ) : (
+                  <Text style={styles.sub}>(no link)</Text>
+                )}
+                <Text style={styles.sub}>
+                  {data.item.score} pts by {data.item.by}{' '}
+                  {Math.abs(
+                    new Date((data.item.time * 1000) / 60).getMinutes() -
+                      new Date().getMinutes(),
+                  )}{' '}
+                  mins ago | {data.item.descendants} comments
+                </Text>
+              </TouchableOpacity>
+            )
           }
           keyExtractor={(item, index) => String(index)}
-          // keyExtractor={item => {
-          //   if (item !== null && item !== '') {
-          //     return item.id.toString();
-          //   }
-          // }}
           onEndReachedThreshold={0.9}
           onEndReached={getNewStories}
         />
