@@ -1,16 +1,18 @@
 import React, {useState, useEffect} from 'react';
 import {FlatList, StyleSheet, Text, View, TouchableOpacity} from 'react-native';
 
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import SkeletonContent from 'react-native-skeleton-content-nonexpo';
 import {Appbar} from 'react-native-paper';
 
 import {Separator} from '../components/Separator';
 import {LoadingIndicatorView} from '../components/LoadingIndicatorView';
 import URLparser from '../components/URLparser';
 
+const INTERVAL_REFRESH = 3000;
+
 export default function HomeScreen({route, navigation}) {
   const [posts, setPosts] = useState([]);
-  const [isSignedIn, setIsSignedIn] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const {umail} = route.params || '';
 
@@ -69,36 +71,55 @@ export default function HomeScreen({route, navigation}) {
 
   return (
     <View>
-      <FlatList // TODO: timestamp, align URL
-        data={posts}
-        keyExtractor={item => item.id}
-        ItemSeparatorComponent={Separator}
-        showsVerticalScrollIndicator={false}
-        showsHorizontalScrollIndicator={false}
-        renderItem={postInfo =>
-          postInfo.item.id !== null ? (
-            <TouchableOpacity
-              style={styles.listItem}
-              onPress={() => handleItemPress(postInfo.item)}>
-              <Text style={styles.title}>{postInfo.item.title}</Text>
-              {postInfo.item.url !== undefined ? (
-                <URLparser url={postInfo.item.url} />
-              ) : (
-                <Text style={styles.sub}>(no link)</Text>
-              )}
-              <Text style={styles.sub}>
-                {postInfo.item.score} pts by {postInfo.item.by}{' '}
-                {new Date((postInfo.item.time * 1000) / 60).getMinutes()} mins
-                ago | {postInfo.item.descendants} comments
-              </Text>
-            </TouchableOpacity>
-          ) : (
-            <LoadingIndicatorView />
-          )
-        }
-        onEndReachedThreshold={0.9}
-        onEndReached={getNewStories}
-      />
+      {posts.length < 1 ? (
+        <SkeletonContent
+          isLoading={loading}
+          containerStyle={styles.skeleton}
+          layout={[
+            {key: 'title', width: '100%', height: 60, margin: 20},
+            {key: 'sub', width: '70%', height: 40, margin: 20},
+          ]}>
+          <FlatList
+            renderItem={
+              <TouchableOpacity>
+                <Text></Text>
+                <Text></Text>
+              </TouchableOpacity>
+            }
+          />
+        </SkeletonContent>
+      ) : (
+        <FlatList // TODO: timestamp, align URL
+          data={posts}
+          keyExtractor={item => item.id}
+          ItemSeparatorComponent={Separator}
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
+          renderItem={postInfo =>
+            postInfo.item.id !== null ? (
+              <TouchableOpacity
+                style={styles.listItem}
+                onPress={() => handleItemPress(postInfo.item)}>
+                <Text style={styles.title}>{postInfo.item.title}</Text>
+                {postInfo.item.url !== undefined ? (
+                  <URLparser url={postInfo.item.url} />
+                ) : (
+                  <Text style={styles.sub}>(no link)</Text>
+                )}
+                <Text style={styles.sub}>
+                  {postInfo.item.score} pts by {postInfo.item.by}{' '}
+                  {new Date((postInfo.item.time * 1000) / 60).getMinutes()} mins
+                  ago | {postInfo.item.descendants} comments
+                </Text>
+              </TouchableOpacity>
+            ) : (
+              <LoadingIndicatorView />
+            )
+          }
+          onEndReachedThreshold={0.9}
+          onEndReached={getNewStories}
+        />
+      )}
 
       <Appbar style={styles.bottom}>
         <Appbar.Action
@@ -143,6 +164,10 @@ const styles = StyleSheet.create({
   listItem: {
     paddingVertical: 12,
     paddingHorizontal: 20,
+  },
+  skeleton: {
+    flex: 1,
+    width: '100%',
   },
   sub: {
     color: 'gray',
