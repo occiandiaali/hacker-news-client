@@ -2,7 +2,6 @@ import React, {useState, useEffect} from 'react';
 import {NavigationContainer, DefaultTheme} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {Image} from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import HomeScreen from './src/screens/HomeScreen';
 import AboutMeScreen from './src/screens/AboutMeScreen';
