@@ -8,11 +8,9 @@ import {Separator} from '../components/Separator';
 import {LoadingIndicatorView} from '../components/LoadingIndicatorView';
 import URLparser from '../components/URLparser';
 
-const INTERVAL_REFRESH = 3000;
-
 export default function HomeScreen({route, navigation}) {
   const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading] = useState(true);
 
   const {umail} = route.params || '';
 
@@ -35,7 +33,6 @@ export default function HomeScreen({route, navigation}) {
         );
       const result = await Promise.all(promises);
       setPosts(result);
-      console.log(`New Count: ${result.length}`);
     } catch (error) {
       console.error(error);
     }
@@ -67,6 +64,7 @@ export default function HomeScreen({route, navigation}) {
     getTopStories();
   }, []);
 
+  // I use this to display the particular story in a webview
   const handleItemPress = article => navigation.navigate('Article', {article});
 
   return (
@@ -97,7 +95,7 @@ export default function HomeScreen({route, navigation}) {
           />
         </SkeletonContent>
       ) : (
-        <FlatList // TODO: timestamp, align URL
+        <FlatList
           data={posts}
           keyExtractor={item => item.id}
           ItemSeparatorComponent={Separator}
@@ -116,8 +114,11 @@ export default function HomeScreen({route, navigation}) {
                 )}
                 <Text style={styles.sub}>
                   {postInfo.item.score} pts by {postInfo.item.by}{' '}
-                  {new Date((postInfo.item.time * 1000) / 60).getMinutes()} mins
-                  ago | {postInfo.item.descendants} comments
+                  {new Date().getMinutes() -
+                    new Date(
+                      (postInfo.item.time * 1000) / 60,
+                    ).getMinutes()}{' '}
+                  mins ago | {postInfo.item.descendants} comments
                 </Text>
               </TouchableOpacity>
             ) : (

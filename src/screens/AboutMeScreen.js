@@ -10,14 +10,6 @@ export default function AboutMeScreen() {
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);
 
-  const fadeMeOut = () => {
-    Animated.timing(opacity, {
-      toValue: 0,
-      duration: 3000,
-      useNativeDriver: true,
-    }).start();
-  };
-
   const fadeMeIn = () => {
     Animated.timing(opacity, {
       toValue: 1,
@@ -27,7 +19,6 @@ export default function AboutMeScreen() {
   };
 
   useEffect(() => {
-    //fadeMeOut();
     fadeMeIn();
     setTimeout(() => showModal(), 7000);
   }, []);
