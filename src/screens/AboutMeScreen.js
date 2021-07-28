@@ -33,8 +33,8 @@ export default function AboutMeScreen() {
           <Text style={styles.heading}>
             Occian Fumnanya Diaali is a Nigerian, born of a royal family from a
             tribe in Delta state. He enjoys reading, painting, cooking, and
-            playing 2D video games when he's not working to improve and increase
-            his software developer skills and knowledge.
+            playing 2D video games when not busy working to improve and increase
+            his developer skills and knowledge.
           </Text>
           <Text style={styles.sub}>
             He sometimes dreams of an equitable world.
