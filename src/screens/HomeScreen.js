@@ -3,6 +3,7 @@ import {FlatList, StyleSheet, Text, View, TouchableOpacity} from 'react-native';
 
 import SkeletonContent from 'react-native-skeleton-content-nonexpo';
 import {Appbar} from 'react-native-paper';
+import moment from 'moment';
 
 import {Separator} from '../components/Separator';
 
@@ -16,8 +17,10 @@ export default function HomeScreen({route, navigation}) {
 
   let authenticated = JSON.stringify(umail);
 
+  const topstories = 'https://hacker-news.firebaseio.com/v0/topstories.json';
+  const newstories = 'https://hacker-news.firebaseio.com/v0/newstories.json';
+
   const getTopStories = async () => {
-    const topstories = 'https://hacker-news.firebaseio.com/v0/topstories.json';
     try {
       const response = await fetch(topstories);
       if (response.ok === false) {
@@ -39,7 +42,6 @@ export default function HomeScreen({route, navigation}) {
   };
 
   const getNewStories = async () => {
-    const newstories = 'https://hacker-news.firebaseio.com/v0/newstories.json';
     try {
       const response = await fetch(newstories);
       if (response.ok === false) {
@@ -64,6 +66,16 @@ export default function HomeScreen({route, navigation}) {
 
   // I use this to display the particular story in a webview
   const handleItemPress = article => navigation.navigate('Article', {article});
+
+  // const renderItem = (post) => {
+  //   post.item.id === null ? (
+  //     {}
+  //   ) : (
+  //     <TouchableOpacity style={styles.listItem} key={post.key}>
+  //       <Text style={styles.title}>{post.item.title}</Text>
+  //     </TouchableOpacity>
+  //   );
+  // };
 
   return (
     <View>
@@ -114,17 +126,17 @@ export default function HomeScreen({route, navigation}) {
                 )}
                 <Text style={styles.sub}>
                   {data.item.score} pts by {data.item.by}{' '}
-                  {Math.abs(
-                    new Date((data.item.time * 1000) / 60).getMinutes() -
-                      new Date().getMinutes(),
-                  )}{' '}
-                  mins ago | {data.item.descendants} comments
+                  {moment(new Date(data.item.time * 1000)).fromNow()} |{' '}
+                  {data.item.descendants} comments
                 </Text>
               </TouchableOpacity>
             )
           }
           keyExtractor={(item, index) => String(index)}
-          onEndReachedThreshold={0.9}
+          initialNumToRender={15}
+          maxToRenderPerBatch={7}
+          removeClippedSubviews={false}
+          onEndReachedThreshold={1}
           onEndReached={getNewStories}
         />
       )}
