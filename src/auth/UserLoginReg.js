@@ -86,6 +86,20 @@ export default function UserLoginReg({navigation}) {
     });
   };
 
+  // check for already registered
+  // const existingAccount = len => {
+  //   txn.executeSql(
+  //     'SELECT * FROM Users WHERE email= ? AND password = ?',
+  //     [email, password],
+  //     () => {
+  //       if (len > 0) {
+  //         Alert.alert('Hey!', 'Account already exists! :( ');
+  //         return;
+  //       }
+  //     },
+  //   );
+  // };
+
   // Authentication method - for Register
   const userRegister = async () => {
     if (!email || !password) {
@@ -93,29 +107,21 @@ export default function UserLoginReg({navigation}) {
       return;
     }
     if (confirmPassword !== password) {
-      Alert.alert('Attention!', 'Passwords do not match!');
+      Alert.alert('Attention!', 'Ensure that passwords match...');
       return;
     }
     try {
       await db.transaction(txn => {
         txn.executeSql(
-          'SELECT * FROM Users WHERE email= ?',
-          [email],
+          'INSERT INTO Users (email, password) VALUES (?, ?)',
+          [email, password],
           (txn, results) => {
-            const len = results.rows.length;
-            if (len > 0) {
-              Alert.alert('Hey!', 'Account already exists! :( ');
-              return;
+            console.log(`Affected rows: ${results.rowsAffected}`);
+            if (results.rowsAffected > 0) {
+              Alert.alert('Success!', 'You are now registered!');
             } else {
-              'INSERT INTO Users (email, password) VALUES (?, ?)',
-                [email, password],
-                (txn, results) => {
-                  if (results.rowsAffected > 0) {
-                    Alert.alert('Success!', 'You are now registered!');
-                  } else {
-                    Alert.alert('Oops!', 'Error: Could not register you! :( ');
-                  }
-                };
+              Alert.alert('Oops!', 'Error: Could not register you! :( ');
+              return;
             }
           },
         );
