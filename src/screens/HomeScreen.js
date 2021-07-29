@@ -118,12 +118,19 @@ export default function HomeScreen({route, navigation}) {
                 style={styles.listItem}
                 key={data.key}
                 onPress={() => handleItemPress(data.item)}>
-                <Text style={styles.title}>{data.item.title}</Text>
-                {data.item.url !== undefined ? (
+                <Text style={styles.title}>
+                  {data.item.title}{' '}
+                  {data.item.url !== undefined ? (
+                    <URLparser url={data.item.url} />
+                  ) : (
+                    <Text style={styles.sublink}>(no link)</Text>
+                  )}
+                </Text>
+                {/* {data.item.url !== undefined ? (
                   <URLparser url={data.item.url} />
                 ) : (
                   <Text style={styles.sub}>(no link)</Text>
-                )}
+                )} */}
                 <Text style={styles.sub}>
                   {data.item.score} pts by {data.item.by}{' '}
                   {moment(new Date(data.item.time * 1000)).fromNow()} |{' '}
@@ -191,6 +198,11 @@ const styles = StyleSheet.create({
   },
   sub: {
     color: 'gray',
+  },
+  sublink: {
+    color: 'gray',
+    fontSize: 16,
+    fontWeight: 'normal',
   },
   title: {
     fontSize: 19,

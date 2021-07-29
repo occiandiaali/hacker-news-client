@@ -11,5 +11,7 @@ export default function URLparser({url}) {
 const styles = StyleSheet.create({
   url: {
     color: 'gray',
+    fontSize: 16,
+    fontWeight: 'normal',
   },
 });
