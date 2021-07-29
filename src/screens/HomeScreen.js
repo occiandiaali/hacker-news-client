@@ -67,16 +67,6 @@ export default function HomeScreen({route, navigation}) {
   // I use this to display the particular story in a webview
   const handleItemPress = article => navigation.navigate('Article', {article});
 
-  // const renderItem = (post) => {
-  //   post.item.id === null ? (
-  //     {}
-  //   ) : (
-  //     <TouchableOpacity style={styles.listItem} key={post.key}>
-  //       <Text style={styles.title}>{post.item.title}</Text>
-  //     </TouchableOpacity>
-  //   );
-  // };
-
   return (
     <View>
       {posts.length < 1 ? (
@@ -126,11 +116,7 @@ export default function HomeScreen({route, navigation}) {
                     <Text style={styles.sublink}>(no link)</Text>
                   )}
                 </Text>
-                {/* {data.item.url !== undefined ? (
-                  <URLparser url={data.item.url} />
-                ) : (
-                  <Text style={styles.sub}>(no link)</Text>
-                )} */}
+
                 <Text style={styles.sub}>
                   {data.item.score} pts by {data.item.by}{' '}
                   {moment(new Date(data.item.time * 1000)).fromNow()} |{' '}

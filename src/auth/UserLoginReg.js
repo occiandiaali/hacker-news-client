@@ -116,7 +116,7 @@ export default function UserLoginReg({navigation}) {
           'INSERT INTO Users (email, password) VALUES (?, ?)',
           [email, password],
           (txn, results) => {
-            console.log(`Affected rows: ${results.rowsAffected}`);
+            // console.log(`Affected rows: ${results.rowsAffected}`);
             if (results.rowsAffected > 0) {
               Alert.alert('Success!', 'You are now registered!');
             } else {
