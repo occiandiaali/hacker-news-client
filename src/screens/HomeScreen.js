@@ -151,7 +151,7 @@ export default function HomeScreen({route, navigation}) {
       <Appbar style={styles.bottom}>
         <Appbar.Action
           icon="information-outline"
-          size={27}
+          size={34}
           onPress={() => navigation.navigate('About')}
         />
 
@@ -160,7 +160,7 @@ export default function HomeScreen({route, navigation}) {
             <Appbar.Action
               icon="account-cog-outline"
               color="black"
-              size={27}
+              size={34}
               onPress={() =>
                 navigation.navigate('UserProfile', {user: authenticated})
               }
@@ -169,7 +169,7 @@ export default function HomeScreen({route, navigation}) {
         ) : (
           <Appbar.Action
             icon="login"
-            size={27}
+            size={34}
             onPress={() => navigation.navigate('Accounts')}
           />
         )}
@@ -184,6 +184,8 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
+    opacity: 0.7,
+
     borderTopRightRadius: 15,
     borderTopLeftRadius: 15,
     backgroundColor: '#ee6c00',
