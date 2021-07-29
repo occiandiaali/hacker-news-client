@@ -68,6 +68,7 @@ const styles = StyleSheet.create({
     fontSize: 21,
     color: 'gray',
     fontWeight: 'bold',
+    fontStyle: 'italic',
     marginBottom: 9,
     lineHeight: 27,
   },
