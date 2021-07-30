@@ -12,13 +12,19 @@ import {TextInput, Button, Divider, Modal, Portal} from 'react-native-paper';
 
 import {openDatabase} from 'react-native-sqlite-storage';
 
+const dbName = 'UsersDB';
+const dbLocation = 'default';
+const tableName = 'Users';
+
 // open the db
 const db = openDatabase(
   {
-    name: 'UserDB',
-    location: 'default',
+    name: dbName,
+    location: dbLocation,
   },
-  () => {},
+  () => {
+    console.log(`${dbName} DB opened at ${dbLocation} location...`);
+  },
   error => {
     console.log(error);
   },
@@ -44,13 +50,16 @@ export default function UserLoginReg({navigation}) {
     padding: 25,
   };
 
-  //create db users table
+  //create users table
   const createTable = () => {
     db.transaction(txn => {
       txn.executeSql(
-        'CREATE TABLE IF NOT EXISTS Users (ID INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT, password TEXT);',
+        `CREATE TABLE IF NOT EXISTS ${tableName} (
+          ID INTEGER PRIMARY KEY AUTOINCREMENT, 
+          email TEXT, password TEXT);`,
       );
     });
+    console.log(`${tableName} Table created in ${dbName}.`);
   };
 
   useEffect(() => {
@@ -65,10 +74,10 @@ export default function UserLoginReg({navigation}) {
     }
     await db.transaction(txn => {
       txn.executeSql(
-        'SELECT * FROM Users WHERE email = ? AND password = ?',
-        [email, password],
+        `SELECT email, password FROM ${tableName}`,
+        [],
         (txn, results) => {
-          const len = results.rows.length;
+          var len = results.rows.length;
           if (!len) {
             Alert.alert('Attention', 'This account does not exist!');
           }
@@ -86,20 +95,6 @@ export default function UserLoginReg({navigation}) {
     });
   };
 
-  // check for already registered
-  // const existingAccount = len => {
-  //   txn.executeSql(
-  //     'SELECT * FROM Users WHERE email= ? AND password = ?',
-  //     [email, password],
-  //     () => {
-  //       if (len > 0) {
-  //         Alert.alert('Hey!', 'Account already exists! :( ');
-  //         return;
-  //       }
-  //     },
-  //   );
-  // };
-
   // Authentication method - for Register
   const userRegister = async () => {
     if (!email || !password) {
@@ -113,14 +108,32 @@ export default function UserLoginReg({navigation}) {
     try {
       await db.transaction(txn => {
         txn.executeSql(
-          'INSERT INTO Users (email, password) VALUES (?, ?)',
+          // check if account already exists
+          `SELECT * FROM ${tableName} WHERE email = ? AND password = ?`,
           [email, password],
           (txn, results) => {
-            // console.log(`Affected rows: ${results.rowsAffected}`);
+            const len = results.rows.length;
+            if (len > 0) {
+              Alert.alert('Hey!', `${email} already exists! :( `);
+              return;
+            }
+          },
+        );
+        txn.executeSql(
+          // Add a new account to sql
+          `INSERT INTO ${tableName} (email, password) VALUES (?, ?)`,
+          [email, password],
+          (txn, results) => {
+            console.log(`Affected rows: ${results.rowsAffected}`);
             if (results.rowsAffected > 0) {
-              Alert.alert('Success!', 'You are now registered!');
+              Alert.alert(
+                `Success!`,
+                `You created an account.
+                Tap on the profile icon at the bottom to access more functionality...
+                `,
+              );
             } else {
-              Alert.alert('Oops!', 'Error: Could not register you! :( ');
+              Alert.alert('Oops!', 'Could not register you! :( ');
               return;
             }
           },
@@ -133,7 +146,7 @@ export default function UserLoginReg({navigation}) {
     } catch (error) {
       console.log(`DB Insertion err: ${error} `);
     }
-  };
+  }; // user reg function
 
   // ============================================
 
