@@ -13,9 +13,13 @@ export default function HomeScreen({route, navigation}) {
   const [posts, setPosts] = useState([]);
   const [loading] = useState(true);
 
-  const {umail} = route.params || '';
+  const {umail, isFlag} = route.params || '';
 
-  let authenticated = JSON.stringify(umail);
+  let useremail = JSON.stringify(umail);
+  let isFlagged = JSON.stringify(isFlag);
+  let valid = Number(isFlagged);
+
+  let isValid = () => (valid === 1 ? true : false);
 
   const topstories = 'https://hacker-news.firebaseio.com/v0/topstories.json';
   const newstories = 'https://hacker-news.firebaseio.com/v0/newstories.json';
@@ -141,14 +145,17 @@ export default function HomeScreen({route, navigation}) {
           onPress={() => navigation.navigate('About')}
         />
 
-        {authenticated ? (
+        {useremail && isValid ? (
           <>
             <Appbar.Action
               icon="account-cog-outline"
               color="black"
               size={34}
               onPress={() =>
-                navigation.navigate('UserProfile', {user: authenticated})
+                navigation.navigate('UserProfile', {
+                  user: useremail,
+                  toks: valid,
+                })
               }
             />
           </>

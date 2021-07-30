@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {StyleSheet, Text, View, Alert} from 'react-native';
+import {StyleSheet, Text, View, TouchableOpacity, Alert} from 'react-native';
 
 import {List, Switch, Divider} from 'react-native-paper';
 
@@ -14,7 +14,10 @@ export default function UserProfileScreen({route, navigation}) {
 
   const onToggleSwitch = () => setIsSwitchOn(!isSwitchOn);
 
-  const {user} = route.params || '';
+  const {user, toks} = route.params || '';
+
+  let token = Number(toks);
+  console.log(`Received token: ${token}`);
 
   const deleteUser = () => {
     db.transaction(tx => {
@@ -88,7 +91,14 @@ export default function UserProfileScreen({route, navigation}) {
       </View>
 
       <List.Section>
-        <List.Item title="Log Out" left={() => <List.Icon icon="logout" />} />
+        <TouchableOpacity
+          onPress={() => {
+            token = 0;
+            navigation.navigate('Home', {isFlag: token});
+            console.log(`Sent to home token: ${token}`);
+          }}>
+          <List.Item title="Log Out" left={() => <List.Icon icon="logout" />} />
+        </TouchableOpacity>
       </List.Section>
     </View>
   );

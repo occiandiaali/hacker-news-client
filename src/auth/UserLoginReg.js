@@ -38,6 +38,7 @@ export default function UserLoginReg({navigation}) {
   const [userEmail, setUserEmail] = useState(email);
   const [userPassword, setUserPassword] = useState(password);
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [toks, setToks] = useState(0);
 
   const [isModalVisible, setModalVisible] = useState(false);
   const showModal = () => setModalVisible(true);
@@ -50,21 +51,35 @@ export default function UserLoginReg({navigation}) {
     padding: 25,
   };
 
+  // temporary flag for user auth
+  let flag = 0;
+
   //create users table
   const createTable = () => {
     db.transaction(txn => {
       txn.executeSql(
         `CREATE TABLE IF NOT EXISTS ${tableName} (
           ID INTEGER PRIMARY KEY AUTOINCREMENT, 
-          email TEXT, password TEXT);`,
+          email TEXT, password TEXT, flag INTEGER);`,
       );
+      console.log(`${tableName} Table created in ${dbName}.`);
     });
-    console.log(`${tableName} Table created in ${dbName}.`);
   };
 
   useEffect(() => {
     createTable();
   }, []);
+
+  // function to close DB
+  // const closeDB = () => {
+  //   if (db) {
+  //     console.log('Closing DB...');
+  //     db.close();
+  //     console.log(`Closed DB`);
+  //   } else {
+  //     console.log('DB was not open...');
+  //   }
+  // };
 
   // Authentication method - for Login
   const userLogin = async () => {
@@ -86,6 +101,7 @@ export default function UserLoginReg({navigation}) {
             if (userPassword === row.password) {
               setUserEmail(userEmail);
               navigation.navigate('Home', {umail: userEmail});
+              closeDB();
             } else {
               Alert.alert('Alert!', 'Authentication Failed!');
             }
@@ -118,7 +134,7 @@ export default function UserLoginReg({navigation}) {
               return;
             }
           },
-        );
+        ); // mark
         txn.executeSql(
           // Add a new account to sql
           `INSERT INTO ${tableName} (email, password) VALUES (?, ?)`,
@@ -127,10 +143,8 @@ export default function UserLoginReg({navigation}) {
             console.log(`Affected rows: ${results.rowsAffected}`);
             if (results.rowsAffected > 0) {
               Alert.alert(
-                `Success!`,
-                `You created an account.
-                Tap on the profile icon at the bottom to access more functionality...
-                `,
+                'Success!',
+                `You just registered as ${email}. Tap on the profile icon at the bottom to access more functionality...`,
               );
             } else {
               Alert.alert('Oops!', 'Could not register you! :( ');
@@ -138,13 +152,14 @@ export default function UserLoginReg({navigation}) {
             }
           },
         );
-      });
-
+      }); // mark 2
+      flag = 1;
       setEmail(email);
       setPassword(password);
-      navigation.navigate('Home', {umail: email});
+      //closeDB();
+      navigation.navigate('Home', {umail: email, isFlag: flag});
     } catch (error) {
-      console.log(`DB Insertion err: ${error} `);
+      console.error(`DB Insertion: ${error} `);
     }
   }; // user reg function
 
@@ -162,7 +177,11 @@ export default function UserLoginReg({navigation}) {
           visible={isModalVisible}
           contentContainerStyle={containerStyle}
           onDismiss={hideModal}>
-          <TextInput label="Email" onChangeText={email => setEmail(email)} />
+          <TextInput
+            label="Email"
+            keyboardType="email-address"
+            onChangeText={email => setEmail(email)}
+          />
           <TextInput
             label="Password"
             secureTextEntry={true}
@@ -192,6 +211,7 @@ export default function UserLoginReg({navigation}) {
       <TextInput
         style={{marginTop: 35}}
         label="Email"
+        keyboardType="email-address"
         onChangeText={userEmail => setUserEmail(userEmail)}
       />
       <TextInput

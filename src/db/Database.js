@@ -1,45 +1,42 @@
-import SQLite from 'react-native-sqlite-storage';
+import {openDatabase} from 'react-native-sqlite-storage';
 
-SQLite.DEBUG(true);
-SQLite.enablePromise(true);
+const dbName = 'UsersDB';
+const dbLocation = 'default';
+const tableName = 'Users';
 
-const dbName = '';
-const dbVersion = '';
-const location = '';
+// open the db
+const db = openDatabase(
+  {
+    name: dbName,
+    location: dbLocation,
+  },
+  () => {
+    console.log(`${dbName} DB opened at ${dbLocation} location...`);
+  },
+  error => {
+    console.log(error);
+  },
+);
 
-const Database = () => {
-  const initDB = () => {
-    let db;
-    return new Promise(resolve => {
-      SQLite.openDatabase(dbName, dbVersion, location).then(DB => {
-        db = DB;
-        db.executeSql('')
-          .then(() => {
-            console.log('Executing...');
-          })
-          .then(
-            db
-              .transaction(txn => {
-                txn.executeSql('CREATE TABLE');
-              })
-              .then(() => console.log('Table created...'))
-              .catch(error => console.log(error)),
-          );
-        resolve(db);
-      });
-    });
-  };
-
-  const closeDB = db => {
-    if (db) {
-      console.log('Closing DB...');
-      db.close()
-        .then(() => {
-          console.log('DB closed');
-        })
-        .catch(error => console.log('DB closed'));
-    }
-  };
+export const getDBConnect = async () => {
+  return db;
 };
 
-export default Database;
+export const getDBName = () => dbName;
+
+export const createTable = async () => {
+  await db.transaction(txn => {
+    txn.executeSql(
+      `CREATE TABLE IF NOT EXISTS ${tableName} (
+        ID INTEGER PRIMARY KEY AUTOINCREMENT, 
+        email TEXT, password TEXT);`,
+    );
+    console.log(`${tableName} Table created in ${dbName}.`);
+  });
+};
+
+// export const deleteTable = async () => {
+//   const deleteQuery = `DROP TABLE ${tableName}`;
+
+//   await db.executeSql(deleteQuery);
+// };
