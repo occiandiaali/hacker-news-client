@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {StyleSheet, Text, View, TouchableOpacity, Alert} from 'react-native';
 
-import {List, Switch, Divider} from 'react-native-paper';
+import {List, Switch, Divider, Button, Modal, Portal} from 'react-native-paper';
 
 import {openDatabase} from 'react-native-sqlite-storage';
 
@@ -13,6 +13,17 @@ export default function UserProfileScreen({route, navigation}) {
   const [isSwitchOn, setIsSwitchOn] = useState(false);
 
   const onToggleSwitch = () => setIsSwitchOn(!isSwitchOn);
+
+  // for delete confirmation pop up - start
+  const [visible, setVisible] = useState(false);
+  const showModal = () => setVisible(true);
+  const hideModal = () => setVisible(false);
+  const containerStyle = {
+    width: '100%',
+    backgroundColor: 'red',
+    borderRadius: 25,
+    padding: 25,
+  };
 
   const {user, toks} = route.params || '';
 
@@ -51,29 +62,30 @@ export default function UserProfileScreen({route, navigation}) {
 
   return (
     <View style={styles.container}>
+      <Portal>
+        <Modal
+          visible={visible}
+          onDismiss={hideModal}
+          contentContainerStyle={containerStyle}>
+          <Text style={styles.warningText}>
+            Are you sure you want to delete your account?
+          </Text>
+          <Text style={styles.warningText}>
+            Tap outside the red box if you want to keep your account
+          </Text>
+          <Text style={styles.warningText}>Otherwise, tap DELETE</Text>
+          <Button>DELETE</Button>
+        </Modal>
+      </Portal>
       <Text style={styles.label}>{user.replace(/['"]+/g, '')}</Text>
-      <List.Section>
-        <List.Subheader>User Settings</List.Subheader>
-        <List.Item title="Feature 1" left={() => <List.Icon icon="folder" />} />
-        <List.Item title="Feature 2" left={() => <List.Icon icon="folder" />} />
-      </List.Section>
-
-      <Divider
-        style={{
-          width: '95%',
-          height: 1,
-          alignSelf: 'center',
-          backgroundColor: 'gray',
-        }}
-      />
 
       <List.Section>
-        <List.Subheader>App Settings</List.Subheader>
+        <List.Subheader>Settings</List.Subheader>
         <List.Item
           title="Contrasts"
           left={() => <List.Icon icon="brightness-6" />}
         />
-        <List.Item title="Memories" left={() => <List.Icon icon="folder" />} />
+        <List.Item title="Bookmarks" left={() => <List.Icon icon="folder" />} />
       </List.Section>
 
       <Divider
@@ -100,18 +112,36 @@ export default function UserProfileScreen({route, navigation}) {
           <List.Item title="Log Out" left={() => <List.Icon icon="logout" />} />
         </TouchableOpacity>
       </List.Section>
+
+      <Divider
+        style={{
+          width: '95%',
+          height: 1,
+          alignSelf: 'center',
+          backgroundColor: 'gray',
+        }}
+      />
+
+      <List.Section>
+        {/* <TouchableOpacity
+          onPress={() => {
+            showModal;
+            // token = 0;
+            // navigation.navigate('Home', {isFlag: token});
+            console.log(`Tapped account deletion`);
+          }}>
+          <List.Item
+            title="Delete account"
+            left={() => <List.Icon icon="delete" />}
+          />
+        </TouchableOpacity> */}
+        <Button onPress={showModal}>Delete Account</Button>
+      </List.Section>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 32,
-  },
-  label: {
-    fontSize: 19,
-    color: 'gray',
-  },
   btn: {
     width: '50%',
     height: 40,
@@ -124,5 +154,16 @@ const styles = StyleSheet.create({
   btnLabel: {
     color: '#fff',
     fontSize: 21,
+  },
+  container: {
+    padding: 32,
+  },
+  label: {
+    fontSize: 19,
+    color: 'gray',
+  },
+  warningText: {
+    fontSize: 21,
+    color: '#FFF',
   },
 });
