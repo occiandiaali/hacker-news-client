@@ -87,28 +87,32 @@ export default function UserLoginReg({navigation}) {
       Alert.alert('Empty Field(s)', 'All fields are required.');
       return;
     }
-    await db.transaction(txn => {
-      txn.executeSql(
-        `SELECT email, password FROM ${tableName}`,
-        [],
-        (txn, results) => {
-          var len = results.rows.length;
-          if (!len) {
-            Alert.alert('Attention', 'This account does not exist!');
-          }
-          if (len > 0) {
-            const row = results.rows.item(0);
-            if (userPassword === row.password) {
-              setUserEmail(userEmail);
-              navigation.navigate('Home', {umail: userEmail});
-              closeDB();
-            } else {
-              Alert.alert('Alert!', 'Authentication Failed!');
+    try {
+      await db.transaction(txn => {
+        txn.executeSql(
+          `SELECT * FROM ${tableName} WHERE email = ? AND password = ?`,
+          [email, password],
+          (txn, results) => {
+            var len = results.rows.length;
+            if (!len) {
+              Alert.alert('Attention', 'This account does not exist!');
+            } else if (len > 0) {
+              const row = results.rows.item(0);
+              if (userPassword === row.password) {
+                flag = 1;
+                setUserEmail(userEmail);
+                navigation.navigate('Home', {umail: userEmail});
+                // closeDB();
+              } else {
+                Alert.alert('Alert!', 'Authentication Failed!');
+              }
             }
-          }
-        },
-      );
-    });
+          },
+        );
+      }); // mark
+    } catch (error) {
+      console.log(`Login error: ${error}`);
+    }
   };
 
   // Authentication method - for Register
