@@ -3,7 +3,7 @@ import React, {useState, useEffect} from 'react';
 import {StyleSheet} from 'react-native';
 
 import {WebView} from 'react-native-webview';
-import FourZeroFour from '../components/FourZeroFour';
+import NotFound from '../components/NotFound';
 import {LoadingIndicatorView} from '../components/LoadingIndicatorView';
 
 const ArticleScreen = props => {
@@ -22,7 +22,7 @@ const ArticleScreen = props => {
       startInLoadingState={true}
     />
   ) : (
-    <FourZeroFour />
+    <NotFound />
   );
 };
 
