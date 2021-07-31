@@ -39,6 +39,7 @@ export default function UserLoginReg({navigation}) {
   const [userPassword, setUserPassword] = useState(password);
   const [confirmPassword, setConfirmPassword] = useState('');
   const [toks, setToks] = useState(0);
+  const [first, setFirst] = useState(true);
 
   const [isModalVisible, setModalVisible] = useState(false);
   const showModal = () => setModalVisible(true);
@@ -54,22 +55,56 @@ export default function UserLoginReg({navigation}) {
   // temporary flag for user auth
   let flag = 0;
 
-  //create users table
-  const createTable = () => {
+  // create users table
+  // const createTable = () => {
+  //   db.transaction(txn => {
+  //     txn.executeSql(
+  //       `CREATE TABLE IF NOT EXISTS ${tableName} (
+  //         ID INTEGER PRIMARY KEY AUTOINCREMENT,
+  //         email TEXT, password TEXT);`,
+  //     );
+  //     console.log(`${tableName} Table created in ${dbName}.`);
+  //   });
+  // };
+  try {
     db.transaction(txn => {
       txn.executeSql(
-        `CREATE TABLE IF NOT EXISTS ${tableName} (
-          ID INTEGER PRIMARY KEY AUTOINCREMENT, 
-          email TEXT, password TEXT, flag INTEGER);`,
+        `SELECT name FROM sqlite_master
+          WHERE type = 'table' AND name = ${tableName}`,
+        (txn, results) => {
+          if (results.rows.length === 0) {
+            setFirst(true);
+            console.log('First time...');
+          } else {
+            console.log('Checked, not first time');
+            setFirst(false);
+          }
+        },
       );
-      console.log(`${tableName} Table created in ${dbName}.`);
+      //
     });
+  } catch (error) {
+    console.log(error);
+  }
+
+  const createTable = () => {
+    try {
+      db.transaction(txn => {
+        txn.executeSql(
+          `CREATE TABLE IF NOT EXISTS ${tableName} (
+          ID INTEGER PRIMARY KEY AUTOINCREMENT, 
+          email TEXT, password TEXT);`,
+        );
+        console.log(`${tableName} Table created in ${dbName}.`);
+      });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {
-    createTable();
+    first ? createTable() : console.log('Not created');
   }, []);
-
   // function to close DB
   // const closeDB = () => {
   //   if (db) {
