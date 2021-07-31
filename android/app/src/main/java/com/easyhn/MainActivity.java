@@ -1,6 +1,7 @@
 package com.easyhn;
 
 import com.facebook.react.ReactActivity;
+import org.pgsqlite.SQLitePluginPackage;
 
 public class MainActivity extends ReactActivity {
 
@@ -12,4 +13,12 @@ public class MainActivity extends ReactActivity {
   protected String getMainComponentName() {
     return "EasyHN";
   }
+
+  @Override
+  protected List<ReactPackage> getPackages() {
+    return Arrays.<ReactPackage>asList(
+      new SQLitePluginPackage(),
+      new MainReactPackage());
+  }
+
 }
