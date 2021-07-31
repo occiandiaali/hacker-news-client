@@ -9,26 +9,27 @@ import {
 } from 'react-native';
 
 import {TextInput, Button, Divider, Modal, Portal} from 'react-native-paper';
+import {database} from '../db/database';
 
-import {openDatabase} from 'react-native-sqlite-storage';
+// import {openDatabase} from 'react-native-sqlite-storage';
 
-const dbName = 'UsersDB';
-const dbLocation = 'default';
-const tableName = 'Users';
+// const dbName = 'UsersDB';
+// const dbLocation = 'default';
+// const tableName = 'Users';
 
-// open the db
-const db = openDatabase(
-  {
-    name: dbName,
-    location: dbLocation,
-  },
-  () => {
-    console.log(`${dbName} DB opened at ${dbLocation} location...`);
-  },
-  error => {
-    console.log(error);
-  },
-);
+// // open the db
+// const db = openDatabase(
+//   {
+//     name: dbName,
+//     location: dbLocation,
+//   },
+//   () => {
+//     console.log(`${dbName} DB opened at ${dbLocation} location...`);
+//   },
+//   error => {
+//     console.log(error);
+//   },
+// );
 
 export default function UserLoginReg({navigation}) {
   // I used separate variables for reg and login
@@ -39,7 +40,7 @@ export default function UserLoginReg({navigation}) {
   const [userPassword, setUserPassword] = useState(password);
   const [confirmPassword, setConfirmPassword] = useState('');
   const [toks, setToks] = useState(0);
-  const [first, setFirst] = useState(true);
+  const [exists, setExists] = useState(false);
 
   const [isModalVisible, setModalVisible] = useState(false);
   const showModal = () => setModalVisible(true);
@@ -55,6 +56,8 @@ export default function UserLoginReg({navigation}) {
   // temporary flag for user auth
   let flag = 0;
 
+  const db = database.db;
+
   // create users table
   // const createTable = () => {
   //   db.transaction(txn => {
@@ -66,45 +69,68 @@ export default function UserLoginReg({navigation}) {
   //     console.log(`${tableName} Table created in ${dbName}.`);
   //   });
   // };
-  try {
-    db.transaction(txn => {
-      txn.executeSql(
-        `SELECT name FROM sqlite_master
-          WHERE type = 'table' AND name = ${tableName}`,
-        (txn, results) => {
-          if (results.rows.length === 0) {
-            setFirst(true);
-            console.log('First time...');
-          } else {
-            console.log('Checked, not first time');
-            setFirst(false);
-          }
-        },
-      );
-      //
-    });
-  } catch (error) {
-    console.log(error);
-  }
 
-  const createTable = () => {
-    try {
-      db.transaction(txn => {
-        txn.executeSql(
-          `CREATE TABLE IF NOT EXISTS ${tableName} (
-          ID INTEGER PRIMARY KEY AUTOINCREMENT, 
-          email TEXT, password TEXT);`,
-        );
-        console.log(`${tableName} Table created in ${dbName}.`);
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  // const createUsersTable = async () => {
+  //   console.log('checking for rows...');
+  //   await db.transaction(txn => {
+  //     txn.executeSql(
+  //       `SELECT name FROM sqlite_master
+  //       WHERE type='table' AND name=${tableName}`,
+  //       [],
+  //       (tx, res) => {
+  //         console.log('rows: ', res.rows.length);
+  //         if (res.rows.length === 0) {
+  //           // tx.executeSql(`DROP TABLE IF EXISTS ${tableName}`, []);
+  //           tx.executeSql(
+  //             `CREATE TABLE IF NOT EXISTS ${tableName}(
+  //               ID INTEGER PRIMARY KEY AUTOINCREMENT,
+  //               email TEXT, password TEXT)`,
+  //             [],
+  //           );
+  //           console.log(`${tableName} created...`);
+  //         } else {
+  //           console.log(`Table already exists...`);
+  //         }
+  //       },
+  //     );
+  //   });
+  // };
 
-  useEffect(() => {
-    first ? createTable() : console.log('Not created');
-  }, []);
+  // useEffect(() => {
+  //   async function checkIfTableExists() {
+  //     return await db
+  //       .transaction(txn => {
+  //         txn.executeSql(
+  //           `SELECT name FROM sqlite_master
+  //               WHERE type = 'table' AND name = ${tableName}`,
+  //           null,
+  //           (txn, res) => {
+  //             if (res.rows.length === 0) {
+  //               setFirstUse(true);
+  //             } else {
+  //               console.log('Rows length > 0. SetFirstUse to false');
+  //               setFirstUse(false);
+  //             }
+  //           },
+  //         );
+  //       })
+  //       .then(() => {
+  //         if (firstUse === true) {
+  //           createTable();
+  //           console.log('First time...');
+  //         }
+  //       })
+  //       .catch(error => console.log(`Sqlite_Master err: ${error}`));
+  //   }
+  //   checkIfTableExists();
+  // }, []);
+
+  // useEffect(() => {
+  //   let response = checkIfTableExists();
+  //   if (response) {
+  //     createTable();
+  //   }
+  // }, []);
   // function to close DB
   // const closeDB = () => {
   //   if (db) {
@@ -116,6 +142,13 @@ export default function UserLoginReg({navigation}) {
   //   }
   // };
 
+  // useEffect(() => {
+  //   const execute = async () => {
+  //     await createUsersTable();
+  //   };
+  //   execute();
+  // }, []);
+
   // Authentication method - for Login
   const userLogin = async () => {
     if (!userEmail || !userPassword) {
@@ -125,11 +158,11 @@ export default function UserLoginReg({navigation}) {
     try {
       await db.transaction(txn => {
         txn.executeSql(
-          `SELECT * FROM ${tableName} WHERE email = ? AND password = ?`,
+          `SELECT * FROM ${database.tableName} WHERE email = ? AND password = ?`,
           [email, password],
           (txn, results) => {
-            var len = results.rows.length;
-            if (!len) {
+            const len = results.rows.length;
+            if (len === 0) {
               Alert.alert('Attention', 'This account does not exist!');
             } else if (len > 0) {
               const row = results.rows.item(0);
@@ -164,7 +197,7 @@ export default function UserLoginReg({navigation}) {
       await db.transaction(txn => {
         txn.executeSql(
           // check if account already exists
-          `SELECT * FROM ${tableName} WHERE email = ? AND password = ?`,
+          `SELECT * FROM ${database.tableName} WHERE email = ? AND password = ?`,
           [email, password],
           (txn, results) => {
             const len = results.rows.length;
@@ -176,7 +209,7 @@ export default function UserLoginReg({navigation}) {
         ); // mark
         txn.executeSql(
           // Add a new account to sql
-          `INSERT INTO ${tableName} (email, password) VALUES (?, ?)`,
+          `INSERT INTO ${database.tableName} (email, password) VALUES (?, ?)`,
           [email, password],
           (txn, results) => {
             console.log(`Affected rows: ${results.rowsAffected}`);
@@ -192,6 +225,7 @@ export default function UserLoginReg({navigation}) {
           },
         );
       }); // mark 2
+
       flag = 1;
       setEmail(email);
       setPassword(password);

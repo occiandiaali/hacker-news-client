@@ -19,7 +19,8 @@ export default function UserProfileScreen({route, navigation}) {
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);
   const containerStyle = {
-    width: '100%',
+    width: '90%',
+    margin: 21,
     backgroundColor: 'red',
     borderRadius: 25,
     padding: 25,

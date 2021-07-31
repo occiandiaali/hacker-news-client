@@ -9,6 +9,8 @@ import {Separator} from '../components/Separator';
 
 import URLparser from '../components/URLparser';
 
+import useDB from '../hooks/useDB';
+
 export default function HomeScreen({route, navigation}) {
   const [posts, setPosts] = useState([]);
   const [loading] = useState(true);
@@ -20,6 +22,8 @@ export default function HomeScreen({route, navigation}) {
   let valid = Number(isFlagged);
 
   let isValid = valid === 1 ? true : false;
+
+  const isDBLoadingComplete = useDB();
 
   const topstories = 'https://hacker-news.firebaseio.com/v0/topstories.json';
   const newstories = 'https://hacker-news.firebaseio.com/v0/newstories.json';
@@ -68,6 +72,9 @@ export default function HomeScreen({route, navigation}) {
     // isValid;
     console.log(`Home mounts, user valid?: ${isValid}`);
     getTopStories();
+    if (isDBLoadingComplete) {
+      console.log('DB loading complete...');
+    }
   }, []);
 
   // I use this to display the particular story in a webview
