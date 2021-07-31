@@ -19,7 +19,7 @@ export default function HomeScreen({route, navigation}) {
   let isFlagged = JSON.stringify(isFlag);
   let valid = Number(isFlagged);
 
-  let isValid = () => (valid === 1 ? true : false);
+  let isValid = valid === 1 ? true : false;
 
   const topstories = 'https://hacker-news.firebaseio.com/v0/topstories.json';
   const newstories = 'https://hacker-news.firebaseio.com/v0/newstories.json';
@@ -65,6 +65,8 @@ export default function HomeScreen({route, navigation}) {
   };
 
   useEffect(() => {
+    // isValid;
+    console.log(`Home mounts, user valid?: ${isValid}`);
     getTopStories();
   }, []);
 
