@@ -8,7 +8,7 @@ import AboutMeScreen from './src/screens/AboutMeScreen';
 import ArticleScreen from './src/screens/ArticleScreen';
 import SplashScreen from './src/screens/SplashScreen';
 import UserProfileScreen from './src/screens/UserProfileScreen';
-import UserLoginReg from './src/auth/UserLoginReg';
+import UserAuth from './src/auth/UserAuth';
 
 const Stack = createStackNavigator();
 
@@ -41,7 +41,7 @@ export default function App() {
         }}>
         <Stack.Screen
           name="Accounts"
-          component={UserLoginReg}
+          component={UserAuth}
           options={{
             title: 'Accounts',
           }}

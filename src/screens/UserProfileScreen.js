@@ -3,9 +3,11 @@ import {StyleSheet, Text, View, TouchableOpacity, Alert} from 'react-native';
 
 import {List, Switch, Divider, Button, Modal, Portal} from 'react-native-paper';
 
-import {openDatabase} from 'react-native-sqlite-storage';
+// import {openDatabase} from 'react-native-sqlite-storage';
 
-const db = openDatabase({name: 'UserDB.db'});
+// const db = openDatabase({name: 'UserDB.db'});
+
+import {database} from '../db/database';
 
 export default function UserProfileScreen({route, navigation}) {
   let [inputUID, setUID] = useState('');
@@ -106,6 +108,7 @@ export default function UserProfileScreen({route, navigation}) {
       <List.Section>
         <TouchableOpacity
           onPress={() => {
+            database.closeDB();
             token = 0;
             navigation.navigate('Home', {isFlag: token});
             console.log(`Sent to home token: ${token}`);
@@ -124,18 +127,6 @@ export default function UserProfileScreen({route, navigation}) {
       />
 
       <List.Section>
-        {/* <TouchableOpacity
-          onPress={() => {
-            showModal;
-            // token = 0;
-            // navigation.navigate('Home', {isFlag: token});
-            console.log(`Tapped account deletion`);
-          }}>
-          <List.Item
-            title="Delete account"
-            left={() => <List.Icon icon="delete" />}
-          />
-        </TouchableOpacity> */}
         <Button onPress={showModal}>Delete Account</Button>
       </List.Section>
     </View>
