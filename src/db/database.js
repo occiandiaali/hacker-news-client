@@ -1,39 +1,52 @@
 import {openDatabase} from 'react-native-sqlite-storage';
 
 const dbName = 'UsersDB';
-const dbLocation = 'default';
+//const dbLocation = 'default';
 const tableName = 'Users';
 
 // open the db
 const db = openDatabase(
   {
     name: dbName,
-    location: dbLocation,
+    // location: dbLocation, This parameter is neglected on android
   },
   () => {
-    console.log(`${dbName} DB opened at ${dbLocation} location...`);
+    console.log(`${dbName} DB opened...`);
   },
   error => {
     console.log(error);
   },
 );
 
+// close the db
+const closeDB = () => {
+  if (db) {
+    console.log('Closing DB...');
+    db.close();
+  } else {
+    console.log('DB was already closed.');
+  }
+};
+
 const createUsersTable = async () => {
   return new Promise((resolve, reject) => {
     db.transaction(
       tx => {
         tx.executeSql(
-          `create table if not exists ${tableName} (
-          id integer primary key not null, email text, password text
+          `CREATE TABLE IF NOT EXISTS ${tableName} (
+          id INTEGER PRIMARY KEY NOT NULL, email TEXT, password TEXT
         );`,
+          [],
         );
-        console.log(`table creation: ${tableName}`);
+      },
+      (_, success) => {
+        console.log(`${tableName} table: created`);
+        resolve(success);
       },
       (_, error) => {
         console.log(`table creation error: ${error}`);
         reject(error);
       },
-      (_, success) => resolve(success),
     );
   });
 };
@@ -43,7 +56,7 @@ const insertUserToTable = async () => {
     db.transaction(
       tx => {
         tx.executeSql(
-          `insert into ${tableName} (email, password) values (?,?)`,
+          `INSERT INTO ${tableName} (email, password) VALUES (?,?)`,
           [email, password],
         );
       },
@@ -81,7 +94,7 @@ const dropUsersTable = async () => {
   return new Promise((resolve, reject) => {
     db.transaction(tx => {
       tx.executeSql(
-        `drop table ${tableName}`,
+        `DROP TABLE ${tableName}`,
         [],
         (_, result) => {
           resolve(result);
@@ -102,4 +115,5 @@ export const database = {
   insertUserToTable,
   getUser,
   dropUsersTable,
+  closeDB,
 };
