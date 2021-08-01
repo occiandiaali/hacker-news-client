@@ -23,7 +23,7 @@ export default function HomeScreen({route, navigation}) {
 
   let isValid = valid === 1 ? true : false;
 
-  const isDBLoadingComplete = useDB();
+  // const isDBLoadingComplete = useDB();
 
   const topstories = 'https://hacker-news.firebaseio.com/v0/topstories.json';
   const newstories = 'https://hacker-news.firebaseio.com/v0/newstories.json';
@@ -72,6 +72,7 @@ export default function HomeScreen({route, navigation}) {
     // isValid;
     console.log(`Home mounts, user valid?: ${isValid}`);
     getTopStories();
+    const isDBLoadingComplete = useDB();
     if (isDBLoadingComplete) {
       console.log('DB loading complete...');
     }
