@@ -2,6 +2,7 @@ import {openDatabase} from 'react-native-sqlite-storage';
 
 const dbName = 'UsersDB';
 //const dbLocation = 'default';
+const dbVersion = '1.0';
 const tableName = 'Users';
 
 // open the db
@@ -29,6 +30,7 @@ const closeDB = () => {
 };
 
 const createUsersTable = async () => {
+  db;
   return new Promise((resolve, reject) => {
     db.transaction(
       tx => {

@@ -45,7 +45,7 @@ export default function UserAuth({navigation}) {
     try {
       await db.transaction(txn => {
         txn.executeSql(
-          `SELECT * FROM ${database.tableName} WHERE email = ? AND password = ?`,
+          `select * from ${database.tableName} where email = ? and password = ?`,
           [email, password],
           (txn, results) => {
             const len = results.rows.length;
@@ -83,7 +83,7 @@ export default function UserAuth({navigation}) {
       await db.transaction(txn => {
         txn.executeSql(
           // check if account already exists
-          `SELECT * FROM ${database.tableName} WHERE email = ? AND password = ?`,
+          `select * from ${database.tableName} where email = ? and password = ?`,
           [email, password],
           (txn, results) => {
             console.log('Check account query completed.');
@@ -94,7 +94,7 @@ export default function UserAuth({navigation}) {
             } else if (len === 0) {
               txn.executeSql(
                 // Add a new account to sql
-                `INSERT INTO ${database.tableName} (email, password) VALUES (?, ?)`,
+                `insert into ${database.tableName} (email, password) values (?, ?)`,
                 [email, password],
                 (txn, results) => {
                   console.log(`Affected rows: ${results.rowsAffected}`);

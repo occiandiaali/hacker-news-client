@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {StyleSheet, Text, View, TouchableOpacity, Alert} from 'react-native';
 
 import {List, Switch, Divider, Button, Modal, Portal} from 'react-native-paper';
@@ -27,7 +27,6 @@ export default function UserProfileScreen({route, navigation}) {
   const {user, toks} = route.params || '';
 
   let token = Number(toks);
-  console.log(`Received token: ${token}`);
 
   const deleteUser = () => {
     db.transaction(tx => {
@@ -58,6 +57,10 @@ export default function UserProfileScreen({route, navigation}) {
       );
     });
   };
+
+  useEffect(() => {
+    console.log(`Received token: ${token}`);
+  }, []);
 
   return (
     <View style={styles.container}>
