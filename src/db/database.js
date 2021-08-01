@@ -33,19 +33,19 @@ const createUsersTable = async () => {
     db.transaction(
       tx => {
         tx.executeSql(
-          `CREATE TABLE IF NOT EXISTS ${tableName} (
-          id INTEGER PRIMARY KEY NOT NULL, email TEXT, password TEXT
+          `create table if not exists ${tableName} (
+          id integer primary key not null, email text, password text
         );`,
           [],
         );
       },
-      (_, success) => {
-        console.log(`${tableName} table: created`);
-        resolve(success);
-      },
       (_, error) => {
         console.log(`table creation error: ${error}`);
         reject(error);
+      },
+      (_, success) => {
+        console.log(`${tableName} table: created`);
+        resolve(success);
       },
     );
   });
@@ -56,7 +56,7 @@ const insertUserToTable = async () => {
     db.transaction(
       tx => {
         tx.executeSql(
-          `INSERT INTO ${tableName} (email, password) VALUES (?,?)`,
+          `insert into ${tableName} (email, password) values (?,?)`,
           [email, password],
         );
       },
@@ -73,7 +73,7 @@ const getUser = setUserFunc => {
   db.transaction(
     tx => {
       tx.executeSql(
-        `SELECT * FROM ${tableName} WHERE email = ? AND password = ?`,
+        `select * from ${tableName} where email = ? and password = ?`,
         [email, password],
         (_, {rows: {_array}}) => {
           setUserFunc(_array);
@@ -94,7 +94,7 @@ const dropUsersTable = async () => {
   return new Promise((resolve, reject) => {
     db.transaction(tx => {
       tx.executeSql(
-        `DROP TABLE ${tableName}`,
+        `drop table ${tableName}`,
         [],
         (_, result) => {
           resolve(result);
@@ -111,6 +111,7 @@ const dropUsersTable = async () => {
 export const database = {
   db,
   tableName,
+  dbName,
   createUsersTable,
   insertUserToTable,
   getUser,

@@ -131,7 +131,7 @@ export default function UserAuth({navigation}) {
         // );
       }); // mark 2
 
-      flag = 1;
+      flag = 1; // set to indicate user has validation
       setEmail(email);
       setPassword(password);
       navigation.navigate('Home', {umail: email, isFlag: flag});

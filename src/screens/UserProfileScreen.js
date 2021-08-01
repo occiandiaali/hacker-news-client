@@ -3,10 +3,6 @@ import {StyleSheet, Text, View, TouchableOpacity, Alert} from 'react-native';
 
 import {List, Switch, Divider, Button, Modal, Portal} from 'react-native-paper';
 
-// import {openDatabase} from 'react-native-sqlite-storage';
-
-// const db = openDatabase({name: 'UserDB.db'});
-
 import {database} from '../db/database';
 
 export default function UserProfileScreen({route, navigation}) {
