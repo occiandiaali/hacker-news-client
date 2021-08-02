@@ -21,7 +21,8 @@ export default function HomeScreen({route, navigation}) {
   let isFlagged = JSON.stringify(isFlag);
   let valid = Number(isFlagged);
 
-  let isValid = valid === 1 ? true : false;
+  // let isValid = valid === 1 ? true : false;
+  let isValid = valid === 'true' ? true : false;
 
   // const isDBLoadingComplete = useDB();
 
