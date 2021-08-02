@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import {
   StyleSheet,
   Text,
@@ -10,15 +10,18 @@ import {
 
 import {TextInput, Button, Divider, Modal, Portal} from 'react-native-paper';
 import {database} from '../db/database';
+import AppContext from '../contexts/AppContext';
 
 export default function UserAuth({navigation}) {
   // I use separate states for reg and login
   // because of a 'quirk' encountered with RN Paper Modal
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [userEmail, setUserEmail] = useState(email);
-  const [userPassword, setUserPassword] = useState(password);
+  // const [email, setEmail] = useState('');
+  // const [password, setPassword] = useState('');
+  // const [userEmail, setUserEmail] = useState(email);
+  // const [userPassword, setUserPassword] = useState(password);
   const [confirmPassword, setConfirmPassword] = useState('');
+
+  const userContext = useContext(AppContext);
 
   const [isModalVisible, setModalVisible] = useState(false);
   const showModal = () => setModalVisible(true);
@@ -38,25 +41,31 @@ export default function UserAuth({navigation}) {
 
   //  - to Login
   const login = async () => {
-    if (!userEmail || !userPassword) {
+    if (!userContext.email && !userContext.password) {
       Alert.alert('Empty Field(s)', 'All fields are required.');
       return;
     }
+
+    // if (!userEmail || !userPassword) {
+    //   Alert.alert('Empty Field(s)', 'All fields are required.');
+    //   return;
+    // }
     try {
       await db.transaction(txn => {
         txn.executeSql(
           `select * from ${database.tableName} where email = ? and password = ?`,
-          [email, password],
+          [userContext.email, userContext.password],
           (txn, results) => {
             const len = results.rows.length;
             if (len === 0) {
               Alert.alert('Attention', 'This account does not exist!');
             } else if (len > 0) {
               const row = results.rows.item(0);
-              if (userPassword === row.password) {
+              if (userContext.password === row.password) {
                 flag = 1;
-                setUserEmail(userEmail);
-                navigation.navigate('Home', {umail: userEmail});
+                // setUserEmail(userEmail);
+                userContext.setUserEmail(userContext.email);
+                navigation.navigate('Home', {umail: userContext.email});
               } else {
                 Alert.alert('Alert!', 'Authentication Failed!');
               }
@@ -71,10 +80,16 @@ export default function UserAuth({navigation}) {
 
   //  - to Register
   const register = async () => {
-    if (!email || !password) {
+    // if (!email || !password) {
+    //   Alert.alert('Attention!', 'Complete ALL fields!');
+    //   return;
+    // }
+
+    if (!userContext.email && !userContext.password) {
       Alert.alert('Attention!', 'Complete ALL fields!');
       return;
     }
+
     if (confirmPassword !== password) {
       Alert.alert('Attention!', 'Ensure that passwords match...');
       return;
@@ -84,24 +99,24 @@ export default function UserAuth({navigation}) {
         txn.executeSql(
           // check if account already exists
           `select * from ${database.tableName} where email = ? and password = ?`,
-          [email, password],
+          [userContext.email, userContext.password],
           (txn, results) => {
             console.log('Check account query completed.');
             const len = results.rows.length;
             if (len > 0) {
-              Alert.alert('Hey!', `${email} already exists! :( `);
+              Alert.alert('Hey!', `${userContext.email} already exists! :( `);
               return;
             } else if (len === 0) {
               txn.executeSql(
                 // Add a new account to sql
                 `insert into ${database.tableName} (email, password) values (?, ?)`,
-                [email, password],
+                [userContext.email, userContext.password],
                 (txn, results) => {
                   console.log(`Affected rows: ${results.rowsAffected}`);
                   if (results.rowsAffected > 0) {
                     Alert.alert(
                       'Success!',
-                      `You have registered as ${email}. Tap on the profile icon at the bottom to see more...`,
+                      `You have registered as ${userContext.email}. Tap on the profile icon at the bottom to see more...`,
                     );
                   } else {
                     Alert.alert('Oops!', 'Could not register you! :( ');
@@ -132,9 +147,12 @@ export default function UserAuth({navigation}) {
       }); // mark 2
 
       flag = 1; // set to indicate user has validation
-      setEmail(email);
-      setPassword(password);
-      navigation.navigate('Home', {umail: email, isFlag: flag});
+      // setEmail(email);
+      // setPassword(password);
+      userContext.setUserEmail(userContext.email);
+      userContext.setUserPassword(userContext.password);
+      const authed = userContext.setIsLoggedIn(true);
+      navigation.navigate('Home', {umail: userContext.email, isFlag: authed});
     } catch (error) {
       console.error(`DB Insertion: ${error} `);
     }
@@ -157,12 +175,12 @@ export default function UserAuth({navigation}) {
           <TextInput
             label="Email"
             keyboardType="email-address"
-            onChangeText={email => setEmail(email)}
+            onChangeText={userContext.setUserEmail(userContext.email)}
           />
           <TextInput
             label="Password"
             secureTextEntry={true}
-            onChangeText={password => setPassword(password)}
+            onChangeText={userContext.setUserPassword(userContext.password)}
           />
           <TextInput
             label="Confirm Password"
@@ -189,12 +207,12 @@ export default function UserAuth({navigation}) {
         style={{marginTop: 35}}
         label="Email"
         keyboardType="email-address"
-        onChangeText={userEmail => setUserEmail(userEmail)}
+        onChangeText={userContext.setUserEmail(userContext.email)}
       />
       <TextInput
         label="Password"
         secureTextEntry={true}
-        onChangeText={userPassword => setUserPassword(userPassword)}
+        onChangeText={userContext.setUserPassword(userContext.password)}
       />
       <Button
         style={{
