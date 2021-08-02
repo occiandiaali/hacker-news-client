@@ -29,28 +29,43 @@ const closeDB = () => {
   }
 };
 
+// const createUsersTable = async () => {
+//   db;
+//   return new Promise((resolve, reject) => {
+//     db.transaction(
+//       tx => {
+//         tx.executeSql(
+//           `create table if not exists ${tableName} (
+//           id integer primary key not null, email text, password text
+//         );`,
+//           [],
+//         );
+//       },
+//       (_, error) => {
+//         console.log(`table creation error: ${error}`);
+//         reject(error);
+//       },
+//       (_, success) => {
+//         console.log(`${tableName} table: created`);
+//         resolve(success);
+//       },
+//     );
+//   });
+// };
+
 const createUsersTable = async () => {
   db;
-  return new Promise((resolve, reject) => {
-    db.transaction(
-      tx => {
-        tx.executeSql(
-          `create table if not exists ${tableName} (
-          id integer primary key not null, email text, password text
-        );`,
-          [],
-        );
-      },
-      (_, error) => {
-        console.log(`table creation error: ${error}`);
-        reject(error);
-      },
-      (_, success) => {
-        console.log(`${tableName} table: created`);
-        resolve(success);
-      },
-    );
-  });
+  await db
+    .transaction(tx => {
+      tx.executeSql(
+        `create table if not exists ${tableName} (
+        id integer primary key not null, email text, password text
+      );`,
+        [],
+      );
+    })
+    .then(console.log(`${tableName} table: created`))
+    .catch(error => console.log(`table creation error: ${error}`));
 };
 
 const insertUserToTable = async () => {

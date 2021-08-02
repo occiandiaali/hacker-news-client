@@ -7,12 +7,16 @@ const useDB = () => {
 
   useEffect(() => {
     async function loadDataAsync() {
-      try {
-        await database.createUsersTable();
-        setDBLoadingComplete(true);
-      } catch (e) {
-        console.warn(e);
-      }
+      await database
+        .createUsersTable()
+        .then(setDBLoadingComplete(true))
+        .catch(e => console.warn(e));
+      // try {
+      //   await database.createUsersTable();
+      //   setDBLoadingComplete(true);
+      // } catch (e) {
+      //   console.warn(e);
+      // }
     }
     loadDataAsync();
   }, []);
